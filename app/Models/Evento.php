@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Evento;
+
 
 class Evento extends Model
 {
@@ -15,6 +17,7 @@ class Evento extends Model
         'address',
         'url',
         'control',
+        'certificado_base',
     ];
 
     protected $hidden = [

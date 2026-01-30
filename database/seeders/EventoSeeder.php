@@ -73,13 +73,40 @@ class EventoSeeder extends Seeder
                 $intentos++;
             }
 
-            // Asignar 200-300 asistentes (Preregistrado)
-            $totalAsistentes = rand(200, 300);
+            // Asignar 200-300 preregistrados (tipo_id = 1)
+            $totalPreregistrados = rand(200, 300);
             $asignados = 0;
+            $intentos = 0;
+            $maxIntentos = $totalPreregistrados * 2;
+
+            while ($asignados < $totalPreregistrados && $intentos < $maxIntentos) {
+                $userId = mt_rand(1, $maxUserId);
+
+                // Verificar si el usuario existe
+                $usuarioExiste = DB::table('users')->where('id', $userId)->exists();
+
+                if ($usuarioExiste) {
+                    try {
+                        $evento->pre_registrados()->syncWithoutDetaching([
+                            $userId => ['tipo_id' => $tipos['Preregistrado']],
+                        ]);
+                        $asignados++;
+                    } catch (\Exception $e) {
+                        if (! str_contains($e->getMessage(), 'Duplicate entry')) {
+                            $this->command->error('Error al asignar preregistrado: '.$e->getMessage());
+                        }
+                    }
+                }
+                $intentos++;
+            }
+
+            // Asignar 50-100 asistentes (tipo_id = 2)
+            $totalAsistentes = rand(50, 100);
+            $asignadosAsistentes = 0;
             $intentos = 0;
             $maxIntentos = $totalAsistentes * 2;
 
-            while ($asignados < $totalAsistentes && $intentos < $maxIntentos) {
+            while ($asignadosAsistentes < $totalAsistentes && $intentos < $maxIntentos) {
                 $userId = mt_rand(1, $maxUserId);
 
                 // Verificar si el usuario existe
@@ -88,9 +115,9 @@ class EventoSeeder extends Seeder
                 if ($usuarioExiste) {
                     try {
                         $evento->asistentes()->syncWithoutDetaching([
-                            $userId => ['tipo_id' => $tipos['Preregistrado']],
+                            $userId => ['tipo_id' => $tipos['Registrado']],
                         ]);
-                        $asignados++;
+                        $asignadosAsistentes++;
                     } catch (\Exception $e) {
                         if (! str_contains($e->getMessage(), 'Duplicate entry')) {
                             $this->command->error('Error al asignar asistente: '.$e->getMessage());
@@ -100,7 +127,7 @@ class EventoSeeder extends Seeder
                 $intentos++;
             }
 
-            $this->command->info("Evento $i creado con éxito. Asistentes asignados: $asignados de $totalAsistentes");
+            $this->command->info("Evento $i creado con éxito. Preregistrados: $asignados, Asistentes: $asignadosAsistentes");
         }
     }
 }
