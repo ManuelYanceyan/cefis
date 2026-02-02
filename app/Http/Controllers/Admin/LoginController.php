@@ -28,7 +28,6 @@ class LoginController extends Controller
 
     public function getLogin()
     {
-        // Asegurar que la sesión esté iniciada para generar el token CSRF correctamente
         if (! session()->isStarted()) {
             session()->start();
         }

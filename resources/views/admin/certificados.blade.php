@@ -1,7 +1,6 @@
 @extends('layouts.admin')
 
 @section('contenido')
-    <!-- Custom Header specific for this view as per user request -->
     <div class="bg-yellow-400 p-4 flex justify-between items-center mb-0 -mx-6 -mt-6">
         <div>
             <h1 class="text-xl font-bold text-gray-800 uppercase tracking-wide">ADMINISTRACION DE CERTIFICADOS</h1>
@@ -16,145 +15,78 @@
         CERTIFICADOS DEL EVENTO {{ $evento->name }}
     </div>
 
-    <!-- Organizadores -->
     <div class="mb-8 bg-white/50">
         <h2 class="text-lg font-bold text-gray-700 mb-2 px-4 uppercase">Organizadores</h2>
         
         <div class="flex items-center mb-4 px-4">
-            <a href="{{ route('generate-certificados-organizadores', $evento->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded shadow text-sm">
+    <div class="flex flex-col items-stretch">
+        <h2 class="text-3xl font-bold uppercase text-center pb-4">
+            Certificados del evento {{ $evento->name }}
+        </h2>
+        <h3 class="text-lg uppercase font-bold p-3 bg-gray-200">
+            Organizadores
+        </h3>
+        <div class="text-justify">
+            <a class="inline-block p-3 bg-blue-500 text-white"
+                href="{{ route('generar-organizadores', ['evento_id' => $evento_id]) }}">
                 Generar certificados
             </a>
         </div>
-
-        <ul class="flex flex-col items-stretch bg-transparent">
-            @forelse ($organizadores as $organizador)
-                <li class="px-4 py-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                    <p class="text-lg uppercase text-slate-600 font-medium">
+        <ul class="flex flex-col items-stretch">
+            @foreach ($organizadores as $organizador)
+                <li class="p-3 flex flex-nowrap">
+                    <p class="text-xl uppercase text-gray-900 grow">
                         {{ $organizador->paternal_surname }} {{ $organizador->maternal_surname }} {{ $organizador->name }}
                     </p>
-                    @if($organizador->pivot->certificado_creado)
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg text-green-500 font-bold">Creado</span>
-                            <a href="{{ route('certificado.download', ['evento_id' => $evento->id, 'certificado_id' => $organizador->id]) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded text-xs">
-                                Ver
-                            </a>
-                        </div>
+                    @if ($organizador->pivot->certificado_creado)
+                        @foreach ($certificados as $certificado)
+                            @if ($certificado->tipo_id == 4 && $certificado->user_id == $organizador->id)
+                                <a href="{{ route('documento', ['certificado_id' => $certificado->id]) }}"
+                                    class="text-xl text-green-600 font-semibold p-2" target="_blank">
+                                    Ver certificado
+                                </a>
+                                @break
+                            @endif
+                        @endforeach
                     @else
-                         <!-- No mostramos nada si no está creado o mostramos algo muy sutil? En la imagen, todos dicen Creado o No creado? -->
-                         <!-- En la imagen 2 se ve "No creado" en naranja a la derecha -->
-                        <span class="text-lg text-amber-500 font-bold">No creado</span>
+                        <span class="text-xl text-amber-600 font-semibold p-2">No creado</span>
                     @endif
                 </li>
-            @empty
-                <li class="p-4 text-center text-gray-500">No hay organizadores registrados.</li>
-            @endforelse
+            @endforeach
         </ul>
-    </div>
-
-    <!-- Ponentes -->
-    <div class="mb-8 bg-white/50">
-        <h2 class="text-lg font-bold text-gray-700 mb-2 px-4 uppercase">Ponentes</h2>
-        
-        <div class="flex items-center mb-4 px-4">
-             <a href="{{ route('generate-certificados-ponentes', $evento->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded shadow text-sm">
+        <h3 class="text-lg uppercase font-bold p-3 bg-gray-200 text-center">
+            Ponentes
+        </h3>
+        <div class="text-center">
+            <a class="inline-block p-3 bg-blue-500 text-white"
+                href="{{ route('generar-ponentes', ['evento_id' => $evento_id]) }}">
                 Generar certificados
             </a>
         </div>
-        
-        <ul class="flex flex-col items-stretch bg-transparent">
-            @forelse ($ponentes as $ponente)
-                <li class="px-4 py-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                    <div class="grow">
-                        <p class="text-lg uppercase text-slate-600 font-medium">
-                            {{ $ponente->paternal_surname }} {{ $ponente->maternal_surname }} {{ $ponente->name }}
+        <ul class="flex flex-col items-stretch">
+            @foreach ($ponentes as $p)
+                <li class="p-4 flex flex-nowrap">
+                    <div class="flex flex-col items-stretch grow">
+                        <p class="py-1 text-xl uppercase text-gray-900">
+                            {{ $p->paternal_surname }} {{ $p->maternal_surname }} {{ $p->name }}
                         </p>
-                        @if($ponente->pivot->ponencia)
-                            <p class="text-xs text-gray-400 uppercase">
-                                {{ $ponente->pivot->ponencia }}
-                            </p>
+                        <p class="px-7 text-md uppercase text-gray-700 italic">
+                            {{ $p->pivot->ponencia }}
+                        </p>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        @if ($p->pivot->certificado_creado)
+                            @foreach ($certificados as $certificado)
+                                @if ($certificado->tipo_id == 3 && $certificado->user_id == $p->id)
+                                    <a href="{{ route('documento', ['certificado_id' => $certificado->id]) }}"
+                                        class="text-xl text-green-600 font-semibold p-2" target="_blank">
+                                        Ver certificado
+                                    </a>
+                                    @break
+                                @endif
+                            @endforeach
+                        @else
+                            <span class="text-xl text-amber-600 font-semibold p-2">No creado</span>
                         @endif
                     </div>
-                    
-                    @if($ponente->pivot->certificado_creado)
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg text-green-500 font-bold">Creado</span>
-                            <a href="{{ route('certificado.download', ['evento_id' => $evento->id, 'certificado_id' => $ponente->id]) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded text-xs">
-                                Ver
-                            </a>
-                        </div>
-                    @else
-                        <span class="text-lg text-amber-500 font-bold">No creado</span>
-                    @endif
-                </li>
-            @empty
-                <li class="p-4 text-center text-gray-500">No hay ponentes registrados.</li>
-            @endforelse
-        </ul>
-    </div>
-
-    <!-- Asistentes -->
-    <div class="mb-8 bg-white/50">
-        <h2 class="text-lg font-bold text-gray-700 mb-2 px-4 uppercase">Asistentes</h2>
-        
-        <div class="flex items-center mb-4 px-4">
-             <a href="{{ route('generate-certificados-asistentes', $evento->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded shadow text-sm">
-                Generar certificados
-            </a>
-        </div>
-        
-        <ul class="flex flex-col items-stretch bg-transparent">
-            @forelse ($asistentes as $asistente)
-                <li class="px-4 py-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                    <p class="text-lg uppercase text-slate-600 font-medium">
-                        {{ $asistente->paternal_surname }} {{ $asistente->maternal_surname }} {{ $asistente->name }}
-                    </p>
-                    @if($asistente->pivot->certificado_creado)
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg text-green-500 font-bold">Creado</span>
-                            <a href="{{ route('certificado.download', ['evento_id' => $evento->id, 'certificado_id' => $asistente->id]) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded text-xs">
-                                Ver
-                            </a>
-                        </div>
-                    @else
-                        <span class="text-lg text-amber-500 font-bold">No creado</span>
-                    @endif
-                </li>
-            @empty
-                <li class="p-4 text-center text-gray-500">No hay asistentes registrados.</li>
-            @endforelse
-        </ul>
-    </div>
-
-    <!-- Preregistrados -->
-    <div class="mb-8 bg-white/50">
-        <h2 class="text-lg font-bold text-gray-700 mb-2 px-4 uppercase">Preregistrados</h2>
-        
-        <div class="flex items-center mb-4 px-4">
-             <a href="{{ route('generate-certificados-preregistrados', $evento->id) }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded shadow text-sm">
-                Generar certificados
-            </a>
-        </div>
-        
-        <ul class="flex flex-col items-stretch bg-transparent">
-            @forelse ($preregistrados as $pre)
-                <li class="px-4 py-2 flex justify-between items-center hover:bg-gray-50 transition-colors">
-                    <p class="text-lg uppercase text-slate-600 font-medium">
-                        {{ $pre->paternal_surname }} {{ $pre->maternal_surname }} {{ $pre->name }}
-                    </p>
-                    @if($pre->pivot->certificado_creado)
-                        <div class="flex items-center gap-2">
-                            <span class="text-lg text-green-500 font-bold">Creado</span>
-                            <a href="{{ route('certificado.download', ['evento_id' => $evento->id, 'certificado_id' => $pre->id]) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-1 px-3 rounded text-xs">
-                                Ver
-                            </a>
-                        </div>
-                    @else
-                        <span class="text-lg text-amber-500 font-bold">No creado</span>
-                    @endif
-                </li>
-            @empty
-                <li class="p-4 text-center text-gray-500">No hay preregistrados.</li>
-            @endforelse
-        </ul>
-    </div>
 @endsection

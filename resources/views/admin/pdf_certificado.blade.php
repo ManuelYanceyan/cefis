@@ -26,7 +26,7 @@
         }
         .content {
             position: absolute;
-            top: 38%; /* Adjust based on "CERTIFICADO" position */
+            top: 38%;
             left: 15%;
             width: 80%;
             text-align: center;
@@ -91,13 +91,11 @@
         
     </div>
         
-    <!-- URL Positioned Bottom Left (as per user markup) -->
     <div style="position: absolute; bottom: 250px; left: 220px; text-align: left; z-index: 10;">
         <p style="font-size: 10px; color: #555; margin: 0;">Verificar en:</p>
         <p style="font-size: 10px; color: #000; margin: 0;">{{ $qrUrl }}</p>
     </div>
 
-    <!-- QR Code Positioned Bottom Right (as per user markup) -->
     <div style="position: absolute; bottom: 110px; right: 120px; z-index: 20;">
         <img src="{{ $qrCodeBase64 }}" alt="QR Code" style="width: 100px; height: auto;">
     </div>

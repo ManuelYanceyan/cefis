@@ -12,19 +12,10 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
 
 class User extends Authenticatable implements OAuthenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, HasRolesAndAbilities, Notifiable;
 
-    /**
-     * @var bool
-     */
     public $timestamps = true;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'paternal_surname',
         'maternal_surname',
@@ -34,21 +25,11 @@ class User extends Authenticatable implements OAuthenticatable
         'dni',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -57,7 +38,6 @@ class User extends Authenticatable implements OAuthenticatable
         ];
     }
 
-    // Relaciones con Evento a través de la tabla pivote participantes
     public function eventosComoPreRegistrado(): BelongsToMany
     {
         return $this->belongsToMany(Evento::class, 'participantes', 'user_id', 'evento_id')
@@ -86,7 +66,6 @@ class User extends Authenticatable implements OAuthenticatable
             ->wherePivot('tipo_id', 4);
     }
 
-    // Relación para obtener todos los eventos del usuario sin importar el tipo
     public function eventos(): BelongsToMany
     {
         return $this->belongsToMany(Evento::class, 'participantes', 'user_id', 'evento_id')
